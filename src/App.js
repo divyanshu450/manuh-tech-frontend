@@ -17,7 +17,7 @@ function App() {
 
   const [formData, setFormData] = useState({
     date: "",
-    exercise: "",
+    exerciseName: "",
     sets: "",
     reps: "",
     weight: "",
@@ -42,14 +42,15 @@ function App() {
   //fetch workouts when member changes
   useEffect(() => {
     if (selectedMember) {
-      fetchWorkouts();
+      fetchWorkouts(selectedMember);
     }
   }, [selectedMember]);
 
   const fetchWorkouts = async (memberId) => {
+    console.log("memberId:", memberId);
     setLoading(true);
     try {
-      const res = await api.get(`/workout?memberId=${memberId}`);
+      const res = await api.get(`/workouts?memberId=${memberId}`);
       setWorkouts(res.data);
     }catch (err) {
       console.error(err);
@@ -65,6 +66,7 @@ function App() {
 
 //add or update workout
 const handleSubmit = async () => {
+  console.log("selectedMember:", selectedMember);
   if(!selectedMember) return;
   try {
     const payload = { 
@@ -77,6 +79,7 @@ const handleSubmit = async () => {
       notes: formData.notes
     };
     if (editingId) {
+      console.log("editingId:", editingId);
       await api.put(`/workouts/${editingId}`, payload);
       setMessage("Workout updated successfully!");
     }
@@ -107,7 +110,7 @@ const handleEdit = (workout) => {
   setEditingId(workout.id);
   setFormData({
     date: workout.date,
-    exerciseName: workout.exercise,
+    exerciseName: workout.exerciseName,
     sets: workout.sets,
     reps: workout.reps,
     weight: workout.weight || "",
@@ -197,7 +200,7 @@ const requestFormReset = () => {
                 {workouts.map((workout) => (
                   <TableRow key={workout.id}>
                     <TableCell>{workout.date}</TableCell>
-                    <TableCell>{workout.exercise}</TableCell>
+                    <TableCell>{workout.exerciseName}</TableCell>
                     <TableCell>{workout.sets}</TableCell>
                     <TableCell>{workout.reps}</TableCell>
                     <TableCell>{workout.weight || "-"}</TableCell>
